@@ -5,13 +5,17 @@
 #include "pathfinding.h"
 
 #include <sstream>
+#include <string>
+
+using std::string;
 
 struct Agent {
-    long serialID, x, y;
+    string serialID;
+    long x, y;
 
-    Agent(): serialID(0), x(0), y(0) {}
+    Agent(): serialID(""), x(0), y(0) {}
 
-    Agent(long serialID_, long x_, long y_): serialID(serialID_), x(x_), y(y_) {}
+    Agent(string serialID_, long x_, long y_): serialID(serialID_), x(x_), y(y_) {}
 };
 
 namespace std {
@@ -19,12 +23,12 @@ namespace std {
         typedef Agent argument_type;
         typedef std::size_t result_type;
         std::size_t operator()(const Agent& agent) const noexcept {
-            return std::hash<int>()((agent.serialID << 1) ^ (agent.serialID >> 1));
+            return std::hash<int>()((agent.x << 1) ^ (agent.x >> 1));
         }
     };
 }
 
-std::unordered_map<long, Agent> agents;
+std::unordered_map<string, Agent> agents;
 
 bool positionChanged(long oldX, long oldY, long newX, long newY) {
     return (oldX != newX) || (oldY != newY);
@@ -32,10 +36,10 @@ bool positionChanged(long oldX, long oldY, long newX, long newY) {
 
 void agent_feedback_callback(const planner_agent::agent_feedback::ConstPtr& msg)
 {
-  long serial_id = msg->serial_id;
+  string serial_id = msg->serial_id;
   long x = msg->current_location.x;
   long y = msg->current_location.y;
-  ROS_INFO("agent feedback %ld at %ld %ld", serial_id, x, y);
+  ROS_INFO("agent feedback %s at %ld %ld", serial_id.c_str(), x, y);
   if(agents.find(serial_id) == agents.end()) {
       agents[serial_id] = Agent{serial_id, x, y};
   } else if(positionChanged(1L, 1L, 2L, 1L)){
@@ -48,11 +52,11 @@ bool generate_plan(planner_agent::get_plan::Request   &rq,
 {
   std::vector<GridLocation> path;
 
-  long serial_id = rq.serial_id;
+  string serial_id = rq.serial_id;
   long x = rq.goal.x;
   long y = rq.goal.y;
 
-  ROS_INFO("generating plan for %ld at %ld %ld", serial_id, x, y);
+  ROS_INFO("generating plan for %s at %ld %ld", serial_id.c_str(), x, y);
 
   if(agents.find(serial_id) == agents.end()) {
       ROS_INFO("requesting agent has never feedback, skipping");

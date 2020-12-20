@@ -1,2 +1,2 @@
-int64 serial_id
+string serial_id
 location current_location

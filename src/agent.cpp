@@ -3,10 +3,13 @@
 #include "planner_agent/update_goal.h"
 #include "planner_agent/agent_feedback.h"
 #include <cstdlib>
+#include <string>
+
+using std::string;
 
 ros::ServiceClient client;
 planner_agent::location current_location;
-long serial_id;
+string serial_id;
 
 bool update_goal(planner_agent::update_goal::Request   &rq,
                   planner_agent::update_goal::Response  &res){
@@ -33,7 +36,7 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  serial_id = atoll(argv[1]);
+  serial_id = argv[1];
   long current_position_x = atoll(argv[2]);
   long current_position_y = atoll(argv[3]);
   current_location.x = current_position_x;current_location.y = current_position_y;
