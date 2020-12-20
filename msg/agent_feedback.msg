@@ -1,0 +1,2 @@
+int64 serial_id
+location current_location
