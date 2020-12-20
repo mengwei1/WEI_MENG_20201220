@@ -13,6 +13,9 @@ string serial_id;
 
 bool update_goal(planner_agent::update_goal::Request   &rq,
                   planner_agent::update_goal::Response  &res){
+  if(rq.serial_id != serial_id) {
+    return false;
+  }
   planner_agent::get_plan srv;
   srv.request.goal = rq.goal;
   srv.request.serial_id = serial_id;

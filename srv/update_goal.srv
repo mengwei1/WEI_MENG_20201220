@@ -1,3 +1,4 @@
+string serial_id
 location goal
 ---
 int64 result
